@@ -2,117 +2,101 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Face Detection with Four Corner Points</title>
+  <title>Face Detection UI</title>
   <style>
+    body {
+      margin: 0;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
     .face-frame-record {
       position: relative;
-      width: 360px;
+      width: 640px;
       height: 480px;
       overflow: hidden;
-      background-color: #000;
+      border-radius: 10px;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     .face-layer {
       position: absolute;
-      align-items: center;
-      justify-content: center;
-      top: 105px;
-      left: 90px;
-      width: 180px;
-      height: 270px;
-      backdrop-filter: blur(8px);
-      border: 2px solid rgba(255, 245, 245, 0.6);
-      border-radius: 20px;
-      background-color: transparent;
-      box-sizing: border-box;
-      z-index: 2;
+      top: 100px; /* simulasi posisi wajah */
+      left: 220px;
+      width: 200px;
+      height: 250px;
+      pointer-events: none;
     }
 
-    .face-video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transform: scaleX(-1); /* Mirror video to match selfie camera behavior */
-    }
-
-    .face-canvas {
+    .corner {
       position: absolute;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #00ffcc;
+    }
+
+    .top-left {
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
+      border-right: none;
+      border-bottom: none;
+    }
+
+    .top-right {
+      top: 0;
+      right: 0;
+      border-left: none;
+      border-bottom: none;
+    }
+
+    .bottom-left {
+      bottom: 0;
+      left: 0;
+      border-right: none;
+      border-top: none;
+    }
+
+    .bottom-right {
+      bottom: 0;
+      right: 0;
+      border-left: none;
+      border-top: none;
     }
   </style>
 </head>
 <body>
   <div class="face-frame-record">
-    <div class="face-layer"></div>
-    <video class="face-video" autoplay playsinline muted></video>
-    <canvas class="face-canvas"></canvas>
+    <video id="video" autoplay muted playsinline></video>
+
+    <!-- Simulasi kotak wajah -->
+    <div class="face-layer">
+      <div class="corner top-left"></div>
+      <div class="corner top-right"></div>
+      <div class="corner bottom-left"></div>
+      <div class="corner bottom-right"></div>
+    </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.18.0/dist/tf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
   <script>
-    async function startFaceDetection() {
-      // Load face-api.js model for face detection
-      await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights');
+    const video = document.getElementById('video');
 
-      const video = document.querySelector('.face-video');
-      const canvas = document.querySelector('.face-canvas');
-      const displaySize = { width: video.offsetWidth, height: video.offsetHeight };
-
-      // Access front-facing camera
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user' }
-        });
+    // Minta akses webcam
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then((stream) => {
         video.srcObject = stream;
-      } catch (err) {
-        console.error('Error accessing camera:', err);
-        alert('Could not access the front camera. Please ensure permissions are granted.');
-        return;
-      }
-
-      // Wait for video to load metadata
-      video.onloadedmetadata = () => {
-        faceapi.matchDimensions(canvas, displaySize);
-
-        // Detect faces and draw four corners in real-time
-        setInterval(async () => {
-          const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
-          const resizedDetections = faceapi.resizeResults(detections, displaySize);
-          const ctx = canvas.getContext('2d');
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-          // Draw only the four corners of the face bounding box
-          resizedDetections.forEach(detection => {
-            const { x, y, width, height } = detection.box;
-
-            // Define the four corners
-            const corners = [
-              { x, y }, // Top-left
-              { x: x + width, y }, // Top-right
-              { x, y: y + height }, // Bottom-left
-              { x: x + width, y: y + height } // Bottom-right
-            ];
-
-            // Draw corner points with futuristic style
-            ctx.fillStyle = '#00ffff'; // Cyan/neon blue for futuristic effect
-            corners.forEach(corner => {
-              ctx.beginPath();
-              ctx.arc(corner.x, corner.y, 5, 0, 2 * Math.PI); // Larger radius for visibility
-              ctx.fill();
-            });
-          });
-        }, 100);
-      };
-    }
-
-    // Start face detection when the page loads
-    window.onload = startFaceDetection;
+      })
+      .catch((err) => {
+        console.error("Gagal mengakses kamera: ", err);
+        alert("Kamera tidak dapat diakses.");
+      });
   </script>
 </body>
 </html>
