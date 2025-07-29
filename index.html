@@ -1,24 +1,145 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
+
 <head>
   <meta charset="UTF-8">
-  <title>Face Detection with Blur</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Facespeech Identity</title>
   <style>
+    :root {
+      --background-screen-color: #f5f8fa;
+      --pure-white: #ffffff;
+      --heading-color: #1a3c6e;
+      --text-color: #5a6a7d;
+      --button-color: #2963FF;
+    }
+
     body {
       margin: 0;
-      background: #000;
+      padding: 20px;
+      background-color: var(--background-screen-color);
+      min-height: 100vh;
       display: flex;
-      align-items: center;
       justify-content: center;
-      height: 100vh;
+      align-items: center;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+      margin: 20px auto;
+      padding: 25px;
+      text-align: center;
+      background: var(--pure-white);
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    button {
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    h1 {
+      font-size: 28px;
+      color: var(--heading-color);
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 20px;
+      color: var(--heading-color);
+      margin: 0 0 20px 0;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e1e8ed;
+    }
+
+    p {
+      color: var(--text-color);
+      margin-bottom: 25px;
+      font-size: 15px;
+    }
+
+    .auth-section {
+      display: flex;
+      justify-content: space-between;
+      margin: 30px 0;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .face-heading {
+      color: var(--pure-white);
+    }
+
+
+    .face-section,
+    .voice-section,
+    .face-section-verification {
+      background: var(--pure-white);
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      flex: 1;
+      min-width: 300px;
+      margin-bottom: 20px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .face-section-verification {
+      background-color: var(--button-color);
+    }
+
+    .face-section:hover,
+    .voice-section:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    }
+
+
+
+    .face-frame {
+      border: 2px dashed #3498db;
+      border-radius: 12px;
+      padding: 15px;
+      margin: 0 auto 20px;
+      max-width: 300px;
+      background-color: var(--background-screen-color);
+      transition: all 0.3s ease;
     }
 
     .face-frame-record {
+      border: 2px solid #3498db;
+      border-radius: 100px;
+      padding: 15px;
+      margin: 0 auto 20px;
+      max-width: 300px;
+      background-color: var(--background-screen-color);
+      transition: all 0.3s ease;
       position: relative;
       width: 640px;
-      height: 480px;
+      height: 360px;
       overflow: hidden;
-      border-radius: 10px;
+      border-radius: 100px;
+    }
+
+
+    .face-frame-record img {
+      border-radius: 100px;
+    }
+
+    .face-frame:hover {
+      border-color: #2980b9;
+      background-color: #f1f7fe;
+    }
+
+    .face-image {
+      width: 100%;
+      border-radius: 8px;
+      height: auto;
+      display: block;
     }
 
     video {
@@ -29,13 +150,12 @@
 
     .face-layer {
       position: absolute;
-      top: 100px;
-      left: 220px;
-      width: 200px;
+      top: 30px;
+      left: 60px;
+      width: 220px;
       height: 250px;
       backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px); /* untuk Safari */
-      border-radius: 20px;
+      -webkit-backdrop-filter: blur(8px);
       background-color: rgba(255, 255, 255, 0.05);
       pointer-events: none;
     }
@@ -75,32 +195,710 @@
       border-left: none;
       border-top: none;
     }
+
+
+    .verify-btn,
+    .continue-btn {
+      background: linear-gradient(135deg, var(--button-color), var(--button-color));
+      color: white;
+      border: none;
+      padding: 14px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      width: 80%;
+      margin-top: 10px;
+      box-shadow: 0 4px 6px rgba(52, 152, 219, 0.2);
+    }
+
+    .verify-btn:hover,
+    .continue-btn:hover {
+      background: linear-gradient(135deg, var(--button-color), var(--button-color));
+      transform: translateY(-2px);
+      box-shadow: 0 6px 8px rgba(52, 152, 219, 0.3);
+    }
+
+    .verify-btns {
+      color: white;
+      border: white 1px solid;
+      background-color: transparent;
+      padding: 14px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      width: 80%;
+      margin-top: 10px;
+      box-shadow: 0 4px 6px rgba(52, 152, 219, 0.2);
+    }
+
+    .voice-wrapper {
+      display: flex;
+      align-items: center;
+      background-color: #fff;
+      border-radius: 12px;
+      padding: 12px 16px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+      font-family: sans-serif;
+      border: 1px solid #e0e0e0;
+      margin-bottom: 10px;
+    }
+
+    .voice-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      line-height: 1.4;
+      color: #333;
+      background: transparent;
+      resize: none;
+      height: 40px;
+    }
+
+    .voice-button {
+      background: none;
+      border: none;
+      padding: 0;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+
+    .voice-button svg {
+      fill: var(--button-color);
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Status Buttons */
+    .status-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 25px 0;
+      flex-wrap: wrap;
+    }
+
+    .status-btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      flex: 1;
+      min-width: 200px;
+      margin: 5px 0;
+    }
+
+    .status-btn.success {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .status-btn.fail {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .status-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Responsive Design */
+    @media only screen and (max-width: 768px) {
+      body {
+        overflow-x: hidden !important;
+      }
+
+      .container {
+        padding: 15px;
+        margin: 10px;
+      }
+
+      .auth-section {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .face-section,
+      .voice-section {
+        margin-bottom: 10px;
+        width: 60%;
+        margin: 0 auto;
+      }
+
+
+      h1 {
+        font-size: 18px;
+        margin-bottom: 10px;
+      }
+
+      p {
+        margin-bottom: 21px;
+        font-size: 14px;
+      }
+
+      .status-buttons {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .status-btn {
+        width: 100%;
+      }
+    }
+
+    /* ****************************** */
+
+
+    .container-xx h2 {
+      margin-bottom: 24px;
+      color: #1a1a1a;
+      font-weight: 600;
+      font-size: 18px;
+    }
+
+    .input-wrapper-xx {
+      display: flex;
+      align-items: center;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      background-color: #fff;
+    }
+
+    .input-wrapper-xx span {
+      background-color: #2963FF;
+      color: white;
+      padding: 12px 16px;
+      font-weight: 600;
+      border-right: 1px solid #e0e0e0;
+    }
+
+    .input-wrapper-xx input {
+      flex: 1;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      outline: none;
+      background-color: transparent;
+    }
+
+    .button-xx {
+      background-color: #2963FF;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.3s ease;
+    }
+
+    .button-xx:hover {
+      background-color: #1749d6;
+    }
+
+    /* **************** */
+    .container-trx-success {
+      background-color: rgb(65, 147, 255);
+      margin: 10px;
+      padding: 0px;
+    }
+
+    .success-icon {
+      font-size: 48px;
+      background: #28a745;
+      width: 80px;
+      height: 80px;
+      line-height: 80px;
+      border-radius: 50%;
+      margin: 20px auto;
+      color: #ffffff;
+      font-weight: bold;
+    }
+
+
+    .details-card {
+      background: #ffffff;
+      color: #333333;
+      padding: 25px;
+      border-top-right-radius: 10px;
+      border-top-left-radius: 10px;
+      margin-bottom: 25px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .details-card p {
+      margin: 10px 0;
+      font-size: 16px;
+      text-align: left;
+    }
+
+    .details-card strong {
+      font-size: 16px;
+      color: #1a3c6e;
+    }
+
+    .back-btn {
+      background-color: transparent;
+      color: #ffffff;
+      border: none;
+      padding: 12px 30px;
+      margin: 20px auto !important;
+      cursor: pointer;
+      width: 80%;
+      font-size: 16px;
+      font-weight: 500;
+      transition: background-color 0.3s;
+      border: 1px solid var(--background-screen-color);
+    }
+
+    .back-btn:hover {
+      background-color: var(--button-color);
+    }
+
+    /* **** */
+    .sukses-card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      padding: 40px 30px;
+      text-align: center;
+      position: relative;
+      width: 90%;
+      max-width: 500px;
+    }
+
+    .sukses-card h1 {
+      font-size: 20px;
+      color: #1c1c1c;
+      margin-bottom: 30px;
+    }
+
+    .sukses-btn {
+      background-color: #2f65f9;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 15px 30px;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      transition: 0.3s;
+    }
+
+    .sukses-btn:hover {
+      background-color: #1e4de1;
+    }
+
+    .sukses-nav {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 14px;
+      display: flex;
+      gap: 15px;
+    }
+
+    .sukses-nav a {
+      color: #555;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .sukses-nav a:hover {
+      text-decoration: underline;
+    }
+
+    /* Tambahan ikon pakai emoji agar simpel */
+    .sukses-icon {
+      font-size: 16px;
+    }
+
+    /* Background dekorasi */
+    .sukses-bg-shape {
+      position: absolute;
+      border-radius: 50%;
+      background-color: #e6edff;
+      z-index: -1;
+    }
+
+    .sukses-bg-tl {
+      width: 100px;
+      height: 100px;
+      top: -50px;
+      left: -50px;
+    }
+
+    .sukses-bg-br {
+      width: 120px;
+      height: 120px;
+      bottom: -60px;
+      right: -60px;
+    }
+
+    /* ********** */
+    .gagal-card {
+      background: white;
+      border-radius: 20px;
+      padding: 40px 30px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+      text-align: left;
+      position: relative;
+    }
+
+    .gagal-card .gagal-icon {
+      width: 50px;
+      height: 50px;
+      background-color: #ff4d4f;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: white;
+      position: absolute;
+      top: -25px;
+      left: calc(50% - 25px);
+    }
+
+    .gagal-card h2 {
+      text-align: center;
+      color: #e53935;
+      margin-top: 40px;
+    }
+
+    .gagal-card p {
+      text-align: center;
+      color: #555;
+      margin-bottom: 30px;
+    }
+
+    .gagal-info-box {
+      background-color: #edf3fd;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .gagal-info-label {
+      font-weight: bold;
+      margin-bottom: 5px;
+      display: block;
+    }
+
+    .gagal-info-value {
+      color: #333;
+    }
+
+    .gagal-info-field {
+      margin-bottom: 15px;
+    }
+
+    .gagal-btn {
+      width: 100%;
+      background-color: #2f65f9;
+      color: white;
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .gagal-btn:hover {
+      background-color: #1f4ed4;
+    }
   </style>
 </head>
-<body>
-  <div class="face-frame-record">
-    <video id="video" autoplay muted playsinline></video>
 
-    <!-- Kotak deteksi wajah dengan efek blur -->
-    <div class="face-layer">
-      <div class="corner top-left"></div>
-      <div class="corner top-right"></div>
-      <div class="corner bottom-left"></div>
-      <div class="corner bottom-right"></div>
+<body>
+  <div class="container" id="container1">
+    <h1>Daftarkan Data Autentikasi Anda</h1>
+    <p>Selesaikan langkah-langkah dibawah untuk mengatur akses akun anda.</p>
+    <div class="auth-section">
+      <div class="face-section">
+        <h2>Perekaman Wajah</h2>
+        <div class="face-frame-record">
+          <img
+            src="https://img.freepik.com/free-vector/smiling-redhaired-boy-illustration_1308-176664.jpg?semt=ais_hybrid&w=740"
+            alt="Face Placeholder" class="face-image">
+        </div>
+        <button class="verify-btn">Ambil Foto Wajah </button>
+      </div>
+      <div class="voice-section">
+        <h2>Verifikasi Suara</h2>
+
+        <div class="voice-wrapper">
+          <textarea class="voice-input" placeholder="Apa nama hewan peliharaan pertama Anda?"></textarea>
+          <button class="voice-button" onclick="startRecognition(this)">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="-3 -2 24 24">
+              <path
+                d="M9 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3zm0-2a5 5 0 0 1 5 5v6a5 5 0 0 1-10 0V5a5 5 0 0 1 5-5zM0 11.03a1 1 0 1 1 2 0A6.97 6.97 0 0 0 8.97 18h.06A6.97 6.97 0 0 0 16 11.03a1 1 0 1 1 2 0A8.97 8.97 0 0 1 9.03 20h-.06A8.97 8.97 0 0 1 0 11.03z" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="voice-wrapper">
+          <textarea class="voice-input" placeholder="Di kota mana anda dilahirkan?"></textarea>
+          <button class="voice-button" onclick="startRecognition(this)">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="-3 -2 24 24">
+              <path
+                d="M9 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3zm0-2a5 5 0 0 1 5 5v6a5 5 0 0 1-10 0V5a5 5 0 0 1 5-5zM0 11.03a1 1 0 1 1 2 0A6.97 6.97 0 0 0 8.97 18h.06A6.97 6.97 0 0 0 16 11.03a1 1 0 1 1 2 0A8.97 8.97 0 0 1 9.03 20h-.06A8.97 8.97 0 0 1 0 11.03z" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="voice-wrapper">
+          <textarea class="voice-input" placeholder="Siapa Nama Ibu anda?"></textarea>
+          <button class="voice-button" onclick="startRecognition(this)">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="-3 -2 24 24">
+              <path
+                d="M9 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3zm0-2a5 5 0 0 1 5 5v6a5 5 0 0 1-10 0V5a5 5 0 0 1 5-5zM0 11.03a1 1 0 1 1 2 0A6.97 6.97 0 0 0 8.97 18h.06A6.97 6.97 0 0 0 16 11.03a1 1 0 1 1 2 0A8.97 8.97 0 0 1 9.03 20h-.06A8.97 8.97 0 0 1 0 11.03z" />
+            </svg>
+          </button>
+        </div>
+
+        <script>
+          function startRecognition(buttonElement) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+              alert("Browser Anda tidak mendukung Speech Recognition.");
+              return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = "id-ID";
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            const targetTextarea = buttonElement.previousElementSibling;
+
+            recognition.onstart = () => {
+              console.log("🎤 Mulai mendengarkan...");
+            };
+
+            recognition.onresult = (event) => {
+              const transcript = event.results[0][0].transcript;
+              targetTextarea.value = transcript;
+              console.log("📝 Teks dikenali:", transcript);
+            };
+
+            recognition.onerror = (event) => {
+              console.error("❌ Error:", event.error);
+            };
+
+            recognition.start();
+          }
+        </script>
+      </div>
+    </div>
+    <button class="continue-btn" id="continue-btn">Simpan Data</button>
+  </div>
+  <div class="container" id="container2">
+    <h1>Verifikasi Identitas Anda</h1>
+    <p>Selesaikan langkah-langkah dibawah untuk mengatur akses akun anda.</p>
+    <div class="auth-section">
+      <div class="face-section-verification">
+        <h2 class="face-heading">Pemindaian Wajah</h2>
+        <div class="face-frame-record">
+          <img
+            src="https://img.freepik.com/free-vector/smiling-redhaired-boy-illustration_1308-176664.jpg?semt=ais_hybrid&w=740"
+            alt="Face Placeholder" class="face-image">
+          <div class="face-layer">
+            <div class="corner top-left"></div>
+            <div class="corner top-right"></div>
+            <div class="corner bottom-left"></div>
+            <div class="corner bottom-right"></div>
+          </div>
+        </div>
+
+        <script>
+          const video = document.getElementById('video');
+
+          navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+              video.srcObject = stream;
+            })
+            .catch((err) => {
+              console.error("Gagal mengakses kamera: ", err);
+              alert("Kamera tidak dapat diakses.");
+            });
+        </script>
+
+
+        <button class="verify-btns">Pindai Wajah</button>
+      </div>
+      <div class="voice-section">
+        <h2>Verifikasi Suara</h2>
+
+        <div class="voice-wrapper">
+          <textarea class="voice-input" placeholder="Pertanyaan Rahasia 1?"></textarea>
+          <button class="voice-button" onclick="startRecognition(this)">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="-3 -2 24 24">
+              <path
+                d="M9 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3zm0-2a5 5 0 0 1 5 5v6a5 5 0 0 1-10 0V5a5 5 0 0 1 5-5zM0 11.03a1 1 0 1 1 2 0A6.97 6.97 0 0 0 8.97 18h.06A6.97 6.97 0 0 0 16 11.03a1 1 0 1 1 2 0A8.97 8.97 0 0 1 9.03 20h-.06A8.97 8.97 0 0 1 0 11.03z" />
+            </svg>
+          </button>
+        </div>
+        <div class="voice-wrapper">
+          <textarea class="voice-input" placeholder="Pertanyaan Rahasia 2?"></textarea>
+          <button class="voice-button" onclick="startRecognition(this)">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="-3 -2 24 24">
+              <path
+                d="M9 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3zm0-2a5 5 0 0 1 5 5v6a5 5 0 0 1-10 0V5a5 5 0 0 1 5-5zM0 11.03a1 1 0 1 1 2 0A6.97 6.97 0 0 0 8.97 18h.06A6.97 6.97 0 0 0 16 11.03a1 1 0 1 1 2 0A8.97 8.97 0 0 1 9.03 20h-.06A8.97 8.97 0 0 1 0 11.03z" />
+            </svg>
+          </button>
+        </div>
+        <div class="voice-wrapper">
+          <textarea class="voice-input" placeholder="Pertanyaan Rahasia 3?"></textarea>
+          <button class="voice-button" onclick="startRecognition(this)">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="-3 -2 24 24">
+              <path
+                d="M9 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3zm0-2a5 5 0 0 1 5 5v6a5 5 0 0 1-10 0V5a5 5 0 0 1 5-5zM0 11.03a1 1 0 1 1 2 0A6.97 6.97 0 0 0 8.97 18h.06A6.97 6.97 0 0 0 16 11.03a1 1 0 1 1 2 0A8.97 8.97 0 0 1 9.03 20h-.06A8.97 8.97 0 0 1 0 11.03z" />
+            </svg>
+          </button>
+        </div>
+        <script>
+          function startRecognition(buttonElement) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+              alert("Browser Anda tidak mendukung Speech Recognition.");
+              return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = "id-ID";
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            const targetTextarea = buttonElement.previousElementSibling;
+
+            recognition.onstart = () => {
+              console.log("🎤 Mulai mendengarkan...");
+            };
+
+            recognition.onresult = (event) => {
+              const transcript = event.results[0][0].transcript;
+              targetTextarea.value = transcript;
+              console.log("📝 Teks dikenali:", transcript);
+            };
+
+            recognition.onerror = (event) => {
+              console.error("❌ Error:", event.error);
+            };
+
+            recognition.start();
+          }
+        </script>
+      </div>
+    </div>
+    <div class="status-buttons" style="margin: 40px;">
+      <button class="status-btn success">Autentikasi Berhasil ✓</button>
+      <button class="status-btn fail">Autentikasi Gagal Ulangi</button>
+    </div>
+    <button class="continue-btn" id="container-btn-xx">Lanjutkan</button>
+  </div>
+  <div class="container-xx" id="container3">
+    <h2>Masukkan Jumlah Transaksi</h2>
+    <div class="input-wrapper-xx">
+      <span>Rp</span>
+      <input type="number" placeholder="0" />
+    </div>
+    <button class="button-xx" id="container-btn-xxx">Lanjutkan</button>
+  </div>
+  <div class="container container-trx-success" id="container4">
+    <svg class="success-icon" xmlns="http://www.w3.org/2000/svg" fill="#000000" width="800px" height="800px"
+      viewBox="0 0 512 512">
+      <path
+        d="M504 256c0 136.967-111.033 248-248 248S8 392.967 8 256 119.033 8 256 8s248 111.033 248 248zM227.314 387.314l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.249-16.379-6.249-22.628 0L216 308.118l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.249 16.379 6.249 22.628.001z" />
+    </svg>
+    <h1>Transaksi Berhasil</h1>
+    <div class="details-card">
+      <p><strong>Transaksi</strong></p>
+      <p><strong>Rp 1.500.000</strong></p>
+      <p>Account Number : 1234567890</p>
+      <p>Recipient: Nama Penerima</p>
+    </div>
+    <button class="button-xx" id="container-btn-xxxx">Lanjutkan</button>
+  </div>
+  <div class="sukses-card container-trx-failed" id="container5">
+    <div class="">
+      <div class="sukses-bg-shape sukses-bg-tl"></div>
+      <div class="sukses-bg-shape sukses-bg-br"></div>
+
+      <div class="sukses-nav">
+        <a href="#"><span class="sukses-icon">👤</span> Logout</a>
+        <a href="#"><span class="sukses-icon">🏠</span> Home</a>
+      </div>
+
+      <h1 style="margin-top: 40px;">Selamat, autentikasi berhasil!</h1>
+      <button class="sukses-btn" id="container-btn-xxxxx">Lakukan Transaksi</button>
     </div>
   </div>
+  <div class="container-trx-failed" id="container6">
+    <div class="gagal-card">
+      <div class="gagal-icon">✖</div>
+      <h2>Transaksi Gagal</h2>
+      <p>Saldo Tidak Cukup</p>
 
-  <script>
-    const video = document.getElementById('video');
+      <div class="gagal-info-box">
+        <div class="gagal-info-field">
+          <span class="gagal-info-label">Nomor Rekening Penerima:</span>
+          <span class="gagal-info-value">1234567890</span>
+        </div>
+      </div>
 
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then((stream) => {
-        video.srcObject = stream;
-      })
-      .catch((err) => {
-        console.error("Gagal mengakses kamera: ", err);
-        alert("Kamera tidak dapat diakses.");
-      });
-  </script>
+      <div class="gagal-info-field">
+        <span class="gagal-info-label">Nama Penerima:</span>
+        <span class="gagal-info-value">Budi Santoso</span>
+      </div>
+
+      <button class="gagal-btn" id="container-btn-xxxxxx">Coba Lagi</button>
+    </div>
+  </div>
 </body>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const containers = [
+      document.getElementById('container1'),
+      document.getElementById('container2'),
+      document.getElementById('container3'),
+      document.getElementById('container4'),
+      document.getElementById('container5'),
+      document.getElementById('container6')
+    ];
+    const buttons = [
+      document.getElementById('continue-btn'),
+      document.getElementById('container-btn-xx'),
+      document.getElementById('container-btn-xxx'),
+      document.getElementById('container-btn-xxxx'),
+      document.getElementById('container-btn-xxxxx'),
+      document.getElementById('container-btn-xxxxxx')
+    ];
+
+    containers[0].style.display = 'block';
+    for (let i = 1; i < containers.length; i++) {
+      containers[i].style.display = 'none';
+    }
+
+    buttons.forEach((button, index) => {
+      button.addEventListener('click', function () {
+        containers.forEach(container => container.style.display = 'none');
+        containers[Math.min(index + 1, containers.length - 1)].style.display = 'block';
+      });
+    });
+  });
+</script>
+
 </html>
