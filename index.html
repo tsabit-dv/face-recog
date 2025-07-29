@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Face Detection UI</title>
+  <title>Face Detection with Blur</title>
   <style>
     body {
       margin: 0;
@@ -29,10 +29,14 @@
 
     .face-layer {
       position: absolute;
-      top: 100px; /* simulasi posisi wajah */
+      top: 100px;
       left: 220px;
       width: 200px;
       height: 250px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px); /* untuk Safari */
+      border-radius: 20px;
+      background-color: rgba(255, 255, 255, 0.05);
       pointer-events: none;
     }
 
@@ -41,6 +45,7 @@
       width: 20px;
       height: 20px;
       border: 2px solid #00ffcc;
+      z-index: 2;
     }
 
     .top-left {
@@ -76,7 +81,7 @@
   <div class="face-frame-record">
     <video id="video" autoplay muted playsinline></video>
 
-    <!-- Simulasi kotak wajah -->
+    <!-- Kotak deteksi wajah dengan efek blur -->
     <div class="face-layer">
       <div class="corner top-left"></div>
       <div class="corner top-right"></div>
@@ -88,7 +93,6 @@
   <script>
     const video = document.getElementById('video');
 
-    // Minta akses webcam
     navigator.mediaDevices.getUserMedia({ video: true })
       .then((stream) => {
         video.srcObject = stream;
